@@ -1,0 +1,88 @@
+# =============== #
+# Unity generated #
+# =============== #
+
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+MemoryCaptures/
+
+# Asset meta data should be tracked
+# !*.meta
+
+# Visual Studio cache
+.vs/
+
+# Rider cache
+.idea/
+*.sln
+*.csproj
+*.unityproj
+*.pidb
+*.user
+*.booproj
+
+# =============== #
+# Unity Packages  #
+# =============== #
+[Ll]ibrary/PackageCache/
+[Ll]ibrary/ScriptAssemblies/
+
+# =============== #
+# Build Artifacts #
+# =============== #
+*.apk
+*.aab
+*.app
+*.exe
+*.xcodeproj
+*.xcworkspace
+*.xcuserstate
+*.xcuserdata
+
+# Crash reports
+sysinfo.txt
+
+# =============== #
+# OS generated    #
+# =============== #
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+*.swp
+
+# Linux
+*~
+
+# =============== #
+# IDE / Editors   #
+# =============== #
+
+# VS Code
+.vscode/
+
+# JetBrains Rider
+.idea/
+
+# =============== #
+# Extra Unity bits #
+# =============== #
+/Builds/
+/ExportedObj/
+/UnityGenerated/
+
+# TextMesh Pro
+[Tt]extMesh Pro/Fonts/
+
+# =============== #
+# Collaborate     #
+# =============== #
+/.obl/
