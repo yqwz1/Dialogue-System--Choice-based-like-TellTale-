@@ -28,7 +28,7 @@ public class DialogueUI : MonoBehaviour
         DialogueText.text = question.questionText;
         for (int i = 0; i < DialogueButtons.Length; i++)
         {
-            DialogueButtons[i].GetComponentInChildren<TextMeshProUGUI>().text = question.answers[i];
+          //  DialogueButtons[i].GetComponentInChildren<TextMeshProUGUI>().text = question.answers[i];
         }
     }
 }

@@ -100,15 +100,16 @@ public class DialogueDataEditor : Editor
     {
         showChoices = EditorGUILayout.Foldout(showChoices, "Choices", FoldoutStyle);
         EditorGUILayout.Space();
-        SerializedProperty choicesProp = serializedObject.FindProperty("answers");
+        SerializedProperty choicesProp = serializedObject.FindProperty("choices");
 
         if (showChoices)
         {
             EditorGUILayout.PropertyField(choicesProp);
+            
         }
         for (int i = 0; i < choicesProp.arraySize; i++)
         {
-            SerializedProperty element = choicesProp.GetArrayElementAtIndex(i);
+            SerializedProperty element = choicesProp.GetArrayElementAtIndex(i).FindPropertyRelative("text");
             if (string.IsNullOrEmpty(element.stringValue))
             {
                 EditorGUILayout.Space(); 
@@ -159,9 +160,9 @@ public class DialogueDataEditor : Editor
             return 0;
         }
         int totalChars = question.questionText.Length + fileName.Length;
-        foreach (string answer in question.answers)
+        foreach (Choice answer in question.choices)
         {
-            totalChars += answer.Length;
+            totalChars += answer.text.Length;
         }
         
         return totalChars;

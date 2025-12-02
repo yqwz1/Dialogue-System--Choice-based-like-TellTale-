@@ -10,7 +10,7 @@ public class Question : ScriptableObject
   
    [TextArea]
    public string questionText;
-   public String[] answers = new String[3];
+   public Choice[] choices = new Choice[3];
    
 
 
