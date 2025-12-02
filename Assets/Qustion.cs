@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 
+
+[ExecuteInEditMode]
 [CreateAssetMenu(fileName = "Dialuage", menuName = "Scriptable Objects/Dialuage")]
 public class Question : ScriptableObject
 {

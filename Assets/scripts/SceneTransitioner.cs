@@ -33,26 +33,31 @@ public class SceneTransitioner : MonoBehaviour
         Debug.Log("Transitioning is starting");
         yield return new WaitForSeconds(transitionDelay);
         Debug.Log("Transitioning is loading");
-        if (!string.IsNullOrEmpty(nextSceneName))
+        
+        int sceneCount = SceneManager.sceneCountInBuildSettings;
+        bool sceneFound = false;
+
+        for (int i = 0; i < sceneCount; i++)
         {
-            for (int i = 0; i < SceneManager.sceneCount; i++)
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+            string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+    
+            if (sceneName == nextSceneName)
             {
-                if (SceneManager.GetSceneByBuildIndex(i).name == nextSceneName)
-                {
-                    Debug.Log($"SceneTransitioner Scene #{nextSceneName} is found...... Loading Scene");
-                    isbuttonClicked = true;
-                    SceneManager.LoadScene(nextSceneName);
-                }
+                sceneFound = true;
+                break;
             }
-            isbuttonClicked = true;
-          Debug.Log($"[SceneTransitioner] Scene #{nextSceneName} isnt found in BuildSettings");
+        }
+
+        if (sceneFound)
+        {
+            Debug.Log($"[SceneTransitioner] Loading scene: {nextSceneName}");
+            SceneManager.LoadScene(nextSceneName);
         }
         else
         {
-            isbuttonClicked = true;
-            Debug.Log("[SceneTransitioner] NextSceneName is null!");
+            Debug.LogError($"[SceneTransitioner] Scene '{nextSceneName}' not found in Build Settings!");
         }
-        
     }
     
 }
