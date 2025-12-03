@@ -127,6 +127,7 @@ public class DialogueDataEditor : Editor
             if (string.IsNullOrEmpty(element.stringValue))
             {
                 EditorGUILayout.Space(); 
+                
                 EditorGUILayout.HelpBox($"Answer {i} is empty!", MessageType.Warning);
                 EditorGUILayout.Space(); 
             }
@@ -209,6 +210,7 @@ public class DialogueDataEditor : Editor
     
         
         SerializedProperty element = choicesList.serializedProperty.GetArrayElementAtIndex(index);
+       
         EditorGUI.PropertyField(rect, element, GUIContent.none);
     }
     
@@ -251,7 +253,40 @@ public class DialogueDataEditor : Editor
     
     private void DrawElementBackground(Rect rect, int index, bool isActive, bool isFocused)
     {
-        // Draw custom background
+      
+        var arrayProp = choicesList.serializedProperty;
+        if (arrayProp == null || index < 0 || index >= arrayProp.arraySize)
+            return;
+
+      
+        Rect bg = new Rect(rect.x + 2, rect.y + 2, rect.width - 4, rect.height - 4);
+
+       
+        SerializedProperty element = arrayProp.GetArrayElementAtIndex(index);
+        SerializedProperty textProp = element?.FindPropertyRelative("text");
+        SerializedProperty nextProp = element?.FindPropertyRelative("nextDialogue");
+
+        bool hasError = false;
+        if (textProp != null && string.IsNullOrEmpty(textProp.stringValue) || nextProp.objectReferenceValue == null)
+        {
+            hasError = true;
+        }
+           
+        
+
+        if (hasError)
+        {
+            int steps = 12;
+            float sliceW = bg.width / steps;
+            for (int i = 0; i < steps; i++)
+            {
+                float t = (float)i / (steps - 1);
+                Color c = Color.Lerp(Color.red, Color.black, t) * new Color(1f, 1f, 1f, 0.22f); // keep alpha low
+                Rect slice = new Rect(bg.x + i * sliceW, bg.y, sliceW + 0.5f, bg.height);
+                EditorGUI.DrawRect(slice, c);
+            }
+            return;
+        }
         if (isFocused)
         {
             EditorGUI.DrawRect(rect, new Color(0.2f, 0.4f, 0.7f, 0.2f));

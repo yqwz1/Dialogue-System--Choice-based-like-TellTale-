@@ -12,9 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e77dfacaefcf0c14d90cf37f42e50495, type: 3}
   m_Name: Dialuage 1
   m_EditorClassIdentifier: 
-  questionText: how are you
-  _answers:
-  - answerText: good
-    nextQuestionNode: {fileID: 0}
-  - answerText: not good
-    nextQuestionNode: {fileID: 0}
+  SpeakerName: wahib
+  questionText: how are you?
+  choices:
+  - text: not not good
+    nextDialogue: {fileID: 0}
+  - text: 
+    nextDialogue: {fileID: 0}
+  - text: New Choice
+    nextDialogue: {fileID: 0}

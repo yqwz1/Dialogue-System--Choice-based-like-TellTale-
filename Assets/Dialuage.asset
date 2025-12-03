@@ -14,7 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpeakerName: Village Elder
   questionText: Stranger, a darkness grows in the forest. Will you help us?
-  answers:
-  - I'll investigate the forest
-  - Tell me more first
-  - Not my problem
+  choices:
+  - text: asd
+    nextDialogue: {fileID: 11400000}
+  - text: 
+    nextDialogue: {fileID: 0}
+  - text: 
+    nextDialogue: {fileID: 0}
