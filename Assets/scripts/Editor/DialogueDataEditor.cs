@@ -2,6 +2,7 @@ using System.IO;
 using PlasticGui.WorkspaceWindow.CodeReview.ReviewChanges.Summary;
 using UnityEngine;
 using UnityEditor;
+using UnityEditorInternal;
 
 
 [CustomEditor(typeof(Question))]
@@ -11,6 +12,8 @@ public class DialogueDataEditor : Editor
     private bool showSpeaker = true;  
     private bool showDialogue = true;
     private bool showChoices = true;
+    
+    private ReorderableList choicesList;
     
     private GUIStyle _headerStyle;
     private GUIStyle HeaderStyle
@@ -49,6 +52,17 @@ public class DialogueDataEditor : Editor
     void OnEnable()
     {
          Question = serializedObject.FindProperty("Question");
+         
+         SerializedProperty choicesProp = serializedObject.FindProperty("choices");
+         
+         choicesList = new ReorderableList(serializedObject, choicesProp, true, true, true, true);
+         
+         choicesList.drawHeaderCallback = DrawChoicesHeader;
+         choicesList.drawElementCallback = DrawChoiceElement;
+         choicesList.elementHeightCallback = GetChoiceElementHeight;
+         choicesList.onAddCallback = OnAddChoice;
+         choicesList.onRemoveCallback = OnRemoveChoice;
+         choicesList.drawElementBackgroundCallback = DrawElementBackground;
     }
     
     public override void OnInspectorGUI()
@@ -104,7 +118,7 @@ public class DialogueDataEditor : Editor
 
         if (showChoices)
         {
-            EditorGUILayout.PropertyField(choicesProp);
+            choicesList.DoLayoutList();
             
         }
         for (int i = 0; i < choicesProp.arraySize; i++)
@@ -175,5 +189,88 @@ public class DialogueDataEditor : Editor
     
         EditorGUI.DrawRect(rect, Color.white);
         EditorGUI.DrawRect(rect, Color.gray);
+    }
+    
+    private void DrawChoicesHeader(Rect rect)
+    {
+       
+        int count = choicesList.count;
+        EditorGUI.LabelField(rect, $"Choices ({count})", EditorStyles.boldLabel);
+    }
+    
+    private void DrawChoiceElement(Rect rect, int index, bool isActive, bool isFocused)
+    {
+        
+        
+        if (isActive)
+        {
+            EditorGUI.DrawRect(rect, new Color(0.3f, 0.5f, 0.8f, 0.3f));  // Light blue tint
+        }
+    
+        
+        SerializedProperty element = choicesList.serializedProperty.GetArrayElementAtIndex(index);
+        EditorGUI.PropertyField(rect, element, GUIContent.none);
+    }
+    
+    private void OnAddChoice(ReorderableList list)
+    {
+        
+        int newIndex = list.serializedProperty.arraySize;
+        list.serializedProperty.arraySize++;
+    
+      
+        SerializedProperty newElement = list.serializedProperty.GetArrayElementAtIndex(newIndex);
+    
+        
+        SerializedProperty textProp = newElement.FindPropertyRelative("text");
+        SerializedProperty nextProp = newElement.FindPropertyRelative("nextDialogue");
+    
+        textProp.stringValue = "New Choice";
+        nextProp.objectReferenceValue = null;
+    
+       
+        list.serializedProperty.serializedObject.ApplyModifiedProperties();
+    }
+    
+    private void OnRemoveChoice(ReorderableList list)
+    {
+        SerializedProperty element = list.serializedProperty.GetArrayElementAtIndex(list.index);
+        SerializedProperty textProp = element.FindPropertyRelative("text");
+    
+        string choiceText = textProp.stringValue;
+    
+        if (EditorUtility.DisplayDialog(
+                "Delete Choice",
+                $"Delete choice \"{choiceText}\"?",
+                "Delete",
+                "Cancel"))
+        {
+            ReorderableList.defaultBehaviours.DoRemoveButton(list);
+        }
+    }
+    
+    private void DrawElementBackground(Rect rect, int index, bool isActive, bool isFocused)
+    {
+        // Draw custom background
+        if (isFocused)
+        {
+            EditorGUI.DrawRect(rect, new Color(0.2f, 0.4f, 0.7f, 0.2f));
+        }
+        else if (index % 2 == 0)
+        {
+            EditorGUI.DrawRect(rect, new Color(0, 0, 0, 0.1f));  // Zebra striping
+        }
+    }
+    
+    private float GetChoiceElementHeight(int index)
+    {
+        // Your choice drawer is 2 lines tall + spacing
+        float line = EditorGUIUtility.singleLineHeight;
+        float spacing = 2f;
+    
+        return (line * 2) + (spacing * 2);
+    
+        // Plus extra spacing between elements
+        return (line * 2) + (spacing * 3);  // Add gap between choices
     }
 }
