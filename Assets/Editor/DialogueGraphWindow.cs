@@ -8,11 +8,12 @@ using UnityEngine.UIElements;
 public class DialogueGraphWindow : EditorWindow
 {
     private int nodeWidth = 180;
-    private int nodeHeight = 120;
+    private int nodeHeight = 60;
     private int horizontalSpacing = 40;
     private int verticalSpacing = 40;
     private int marginLeft = 20;
     private int marginTop = 80;
+    private Vector2 scrollPosition = Vector2.zero;
   
     private Question[] questionArray;
     
@@ -78,6 +79,8 @@ public class DialogueGraphWindow : EditorWindow
     {
         Rect windowRect = new Rect(0f, 0f, position.width, position.height);
        EditorGUI.DrawRect(windowRect, new Color(0.15f, 0.15f, 0.15f, 0.9f));
+      scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+      
        DrawGrid();
         if (questionArray == null || questionArray.Length == 0)
         {
@@ -95,19 +98,21 @@ public class DialogueGraphWindow : EditorWindow
         Event e = Event.current;
         if (e.type == EventType.MouseDown && windowRect.Contains(e.mousePosition))
         {
-           Vector2 mousepoistion = e.mousePosition;
+           Vector2 mouseposition = e.mousePosition;
            for (int i = 0; i < questionArray.Length; i++)
            {
-               Selection.activeObject = questionArray[i];
-               Debug.Log($"DialogueGraphWindow: mousepoistion {mousepoistion}");
-               e.Use();
+               if (nodeRects[i].Contains(mouseposition)) 
+               {
+                   Selection.activeObject = questionArray[i];
+                   EditorGUI.DrawRect(nodeRects[i], new Color(0, 0.5f, 0.5f, 1f));
+                   Debug.Log($"Selected: {questionArray[i].name}");
+                   e.Use();
+                   break;  
+               }
            }
         }
 
-        if (e.type == EventType.MouseDrag && windowRect.Contains(e.mousePosition))
-        {
-            
-        }
+       
         
         
         Handles.BeginGUI();
@@ -154,7 +159,7 @@ public class DialogueGraphWindow : EditorWindow
        
         
         Handles.EndGUI();
-        
+        EditorGUILayout.EndScrollView();
     }            
 
     private Vector2 gridformula(int gridX, int gridY)
@@ -178,11 +183,12 @@ public class DialogueGraphWindow : EditorWindow
         int gridy = i / 3;
         Vector2 GF = gridformula(gridx, gridy);
         Rect grid = new Rect(GF.x, GF.y, nodeWidth, nodeHeight);
-        Rect outline = new Rect(grid.x, grid.y, nodeWidth, 10f);
-        Rect borderBellow = new Rect(grid.x, grid.y + 120, nodeWidth, 5);
+        Rect outline = new Rect(grid.x, grid.y, nodeWidth, 7f);
+        Rect borderBellow = new Rect(grid.x, grid.y - nodeHeight + 120, nodeWidth,  5);
         Rect borderRight = new Rect(grid.x + 180, grid.y, 5, nodeHeight + 5);
 
         EditorGUI.DrawRect(grid, new Color(0.25f, 0.25f, 0.25f, 1f));
+        nodeRects[i] = grid;
         EditorGUI.DrawRect(borderBellow, new Color(0.11f, 0.11f, 0.11f, 0.8f));
         EditorGUI.DrawRect(borderRight, new Color(0.11f, 0.11f, 0.11f, 0.8f));
         bool missingSpeaker = string.IsNullOrEmpty(q.SpeakerName);
