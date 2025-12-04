@@ -13,9 +13,27 @@ public class DialogueGraphWindow : EditorWindow
     private int verticalSpacing = 40;
     private int marginLeft = 20;
     private int marginTop = 80;
+  
     private Question[] questionArray;
     
     private Rect[] nodeRects;
+    
+    private GUIStyle _textStyle;
+    private GUIStyle TextStyle
+    {
+        get
+        {
+            if (_textStyle == null)
+            {
+                _textStyle = new GUIStyle();
+                _textStyle.fontSize = 14;
+                _textStyle.fontStyle = FontStyle.Bold;
+                _textStyle.normal.textColor = Color.white;
+               
+            }
+            return _textStyle;
+        }
+    }
 
     [MenuItem("Window/Dialogue Graph")]
     public static void ShowWindow()
@@ -58,7 +76,9 @@ public class DialogueGraphWindow : EditorWindow
 
     private void OnGUI()
     {
-        
+        Rect windowRect = new Rect(0f, 0f, position.width, position.height);
+       EditorGUI.DrawRect(windowRect, new Color(0.15f, 0.15f, 0.15f, 0.9f));
+       DrawGrid();
         if (questionArray == null || questionArray.Length == 0)
         {
             EditorGUILayout.LabelField("No questions to display.");
@@ -68,18 +88,27 @@ public class DialogueGraphWindow : EditorWindow
         for (int i = 0; i < questionArray.Length; i++)
         {
             Question q = questionArray[i];
-            int gridx = i % 3;
-            int gridy = i / 3;
-            Vector2 GF = gridformula(gridx, gridy);
-            Rect grid = new Rect(GF.x, GF.y, nodeWidth, nodeHeight);
-
-            EditorGUI.DrawRect(grid, new Color(0.5f, 0.5f, 0.5f, 0.5f));
-
-            string text = (q != null) ? q.questionText : "<missing Question asset>";
-            GUI.Label(new Rect(grid.x + 8, grid.y + 8, grid.width - 16, grid.height - 16), text);
             
+            DrawBox(i,q);
 
         }
+        Event e = Event.current;
+        if (e.type == EventType.MouseDown && windowRect.Contains(e.mousePosition))
+        {
+           Vector2 mousepoistion = e.mousePosition;
+           for (int i = 0; i < questionArray.Length; i++)
+           {
+               Selection.activeObject = questionArray[i];
+               Debug.Log($"DialogueGraphWindow: mousepoistion {mousepoistion}");
+               e.Use();
+           }
+        }
+
+        if (e.type == EventType.MouseDrag && windowRect.Contains(e.mousePosition))
+        {
+            
+        }
+        
         
         Handles.BeginGUI();
         Handles.color = Color.green;
@@ -141,5 +170,70 @@ public class DialogueGraphWindow : EditorWindow
         float centerY = topleft.y + (nodeHeight / 2);
         
         return new Vector2(centerX, centerY);
+    }
+
+    private void DrawBox(int i , Question q)
+    {
+        int gridx = i % 3;
+        int gridy = i / 3;
+        Vector2 GF = gridformula(gridx, gridy);
+        Rect grid = new Rect(GF.x, GF.y, nodeWidth, nodeHeight);
+        Rect outline = new Rect(grid.x, grid.y, nodeWidth, 10f);
+        Rect borderBellow = new Rect(grid.x, grid.y + 120, nodeWidth, 5);
+        Rect borderRight = new Rect(grid.x + 180, grid.y, 5, nodeHeight + 5);
+
+        EditorGUI.DrawRect(grid, new Color(0.25f, 0.25f, 0.25f, 1f));
+        EditorGUI.DrawRect(borderBellow, new Color(0.11f, 0.11f, 0.11f, 0.8f));
+        EditorGUI.DrawRect(borderRight, new Color(0.11f, 0.11f, 0.11f, 0.8f));
+        bool missingSpeaker = string.IsNullOrEmpty(q.SpeakerName);
+        bool missingText = string.IsNullOrEmpty(q.questionText);
+        bool missingChoices = (q.choices == null || q.choices.Length == 0);
+
+
+        if (missingSpeaker && missingText && missingChoices)
+        {
+            EditorGUI.DrawRect(outline, Color.red);
+        }
+        else if (missingSpeaker || missingText || missingChoices)
+        {
+                
+            EditorGUI.DrawRect(outline, Color.orange);
+
+            if (missingSpeaker)
+            {
+                Rect rect = new Rect(outline.x, outline.y - 43f, nodeWidth, nodeHeight);
+                EditorGUI.LabelField(rect, "The Speaker Name is empty.");
+            }
+        }
+        else
+        {
+              
+            EditorGUI.DrawRect(outline, Color.green);
+        }
+
+
+        Vector2 nodecenter = nodeCenter(GF);
+        Rect centerText = new Rect(nodecenter.x, nodecenter.y, nodeWidth, nodeHeight);
+        string text = (q != null) ? q.questionText : "<missing Question asset>";
+        EditorGUI.LabelField(centerText, text, TextStyle);
+    }
+    
+    private void DrawGrid(float gridSpacing = 20f, float gridOpacity = 0.1f)
+    {
+        Color originalColor = Handles.color;
+        Handles.color = new Color(1f, 1f, 1f, gridOpacity);
+        
+        float width = position.width;
+        float height = position.height;
+        
+        for (float x = 0; x < width; x += gridSpacing)
+        {
+            Handles.DrawLine(new Vector3(x, 0, 0), new Vector3(x, height, 0));
+        }
+        for (float y = 0; y < height; y += gridSpacing)
+        {
+            Handles.DrawLine(new Vector3(0, y, 0), new Vector3(width, y, 0));
+        }
+        Handles.color = originalColor;
     }
 }
