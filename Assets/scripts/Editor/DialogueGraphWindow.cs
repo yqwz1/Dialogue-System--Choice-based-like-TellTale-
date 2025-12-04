@@ -14,6 +14,8 @@ public class DialogueGraphWindow : EditorWindow
     private int marginLeft = 20;
     private int marginTop = 80;
     private Question[] questionArray;
+    
+    private Rect[] nodeRects;
 
     [MenuItem("Window/Dialogue Graph")]
     public static void ShowWindow()
@@ -50,6 +52,8 @@ public class DialogueGraphWindow : EditorWindow
             }
             questionArray[i] = q;
         }
+        
+        nodeRects = new Rect[questionArray.Length];
     }
 
     private void OnGUI()
@@ -73,13 +77,69 @@ public class DialogueGraphWindow : EditorWindow
 
             string text = (q != null) ? q.questionText : "<missing Question asset>";
             GUI.Label(new Rect(grid.x + 8, grid.y + 8, grid.width - 16, grid.height - 16), text);
+            
+
         }
-    }
+        
+        Handles.BeginGUI();
+        Handles.color = Color.green;
+        for (int i = 0; i < questionArray.Length; i++)
+        {
+            Question q = questionArray[i];
+            for (int j = 0; j < q.choices.Length; j++)
+            {
+                if (q.choices[j].nextDialogue != null)
+                {
+                    int gridx = i % 3;
+                    int gridy = i / 3;
+                    Vector2 GF = gridformula(gridx, gridy);
+                    Rect grid = new Rect(GF.x, GF.y, nodeWidth, nodeHeight);
+                   Vector2 nodecenter = nodeCenter(GF);
+                   
+                   int targetIndex = -1;
+                   for (int f = 0; f < questionArray.Length; f++)
+                   {
+                       if (questionArray[f] == q.choices[j].nextDialogue) 
+                       {
+                           targetIndex = f;
+                           break;
+                       }
+                   }
+
+                   if (targetIndex != -1)
+                   {
+                       int gridx2 = targetIndex % 3;
+                       int gridy2 = targetIndex / 3;
+                       Vector2 GF2 = gridformula(gridx2, gridy2);
+                       Rect grid2 = new Rect(GF2.x, GF2.y, nodeWidth, nodeHeight);
+                       Vector2 nodecenter2 = nodeCenter(GF2);
+
+                       Handles.DrawLine(nodecenter, nodecenter2);
+                   }
+                   
+                   
+                    
+                }
+            }
+        }
+       
+        
+        Handles.EndGUI();
+        
+    }            
 
     private Vector2 gridformula(int gridX, int gridY)
     {
         int screenX = gridX * (nodeWidth + horizontalSpacing) + marginLeft;
         int screenY = gridY * (nodeHeight + verticalSpacing) + marginTop;
         return new Vector2(screenX, screenY);
+    }
+
+    private Vector2 nodeCenter(Vector2 topleft)
+    {
+        float centerX = topleft.x + (nodeWidth / 2);
+        float centerY = topleft.y + (nodeHeight / 2);
+        
+        return new Vector2(centerX, centerY);
     }
 }

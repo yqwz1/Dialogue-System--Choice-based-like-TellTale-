@@ -26,7 +26,7 @@ public class DialogueDataEditor : Editor
                 _headerStyle.fontSize = 20;
                 _headerStyle.fontStyle = FontStyle.Bold;
                 _headerStyle.normal.textColor = Color.white;
-                _headerStyle.margin = new RectOffset(10, 10, 10, 10);
+               
             }
             return _headerStyle;
         }
@@ -78,10 +78,12 @@ public class DialogueDataEditor : Editor
         
        
         DrawAssetHeader(fileName, totalChars);
-        
-        
+
+       
         DrawSpeakerSection();
+        
         DrawDialogueSection();
+        
         DrawChoicesSection();
         
         serializedObject.ApplyModifiedProperties();
@@ -91,7 +93,12 @@ public class DialogueDataEditor : Editor
 
     private void DrawDialogueSection()
     {
-        showDialogue = EditorGUILayout.Foldout(showDialogue, "Dialogue", FoldoutStyle);
+        Rect rect = EditorGUILayout.GetControlRect();
+        EditorGUI.DrawRect(rect,new Color(0.18f, 0.18f, 0.18f, 1f));
+        EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, 2), new Color(0.3f, 0.3f, 0.3f));
+        EditorGUI.DrawRect(new Rect(rect.x, rect.y + rect.height - 2, rect.width, 2), new Color(0.3f, 0.3f, 0.3f));
+        showDialogue = EditorGUI.Foldout(rect, showDialogue, "Dialogue", true, FoldoutStyle);
+        
         EditorGUILayout.Space();
         SerializedProperty dialogueTextProp = serializedObject.FindProperty("questionText");
         if (dialogueTextProp.stringValue == string.Empty)
