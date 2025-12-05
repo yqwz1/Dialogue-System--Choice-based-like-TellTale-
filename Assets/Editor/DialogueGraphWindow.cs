@@ -1,5 +1,6 @@
 // csharp
 using System;
+using Codice.Client.BaseCommands;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -14,6 +15,7 @@ public class DialogueGraphWindow : EditorWindow
     private int marginLeft = 20;
     private int marginTop = 80;
     private Vector2 scrollPosition = Vector2.zero;
+    Rect windowRect = new Rect(20, 20, 120, 50);
   
     private Question[] questionArray;
     
@@ -82,6 +84,7 @@ public class DialogueGraphWindow : EditorWindow
       scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
       
        DrawGrid();
+       DrawToolStrip();
         if (questionArray == null || questionArray.Length == 0)
         {
             EditorGUILayout.LabelField("No questions to display.");
@@ -104,10 +107,13 @@ public class DialogueGraphWindow : EditorWindow
                if (nodeRects[i].Contains(mouseposition)) 
                {
                    Selection.activeObject = questionArray[i];
-                   EditorGUI.DrawRect(nodeRects[i], new Color(0, 0.5f, 0.5f, 1f));
                    Debug.Log($"Selected: {questionArray[i].name}");
                    e.Use();
                    break;  
+               }
+               else
+               {
+                   Selection.activeObject = null;
                }
            }
         }
@@ -186,11 +192,16 @@ public class DialogueGraphWindow : EditorWindow
         Rect outline = new Rect(grid.x, grid.y, nodeWidth, 7f);
         Rect borderBellow = new Rect(grid.x, grid.y - nodeHeight + 120, nodeWidth,  5);
         Rect borderRight = new Rect(grid.x + 180, grid.y, 5, nodeHeight + 5);
-
-        EditorGUI.DrawRect(grid, new Color(0.25f, 0.25f, 0.25f, 1f));
-        nodeRects[i] = grid;
+        Rect highlighter = new Rect(grid.x - 2, grid.y - 2, nodeWidth + 4, nodeHeight + 4);
         EditorGUI.DrawRect(borderBellow, new Color(0.11f, 0.11f, 0.11f, 0.8f));
         EditorGUI.DrawRect(borderRight, new Color(0.11f, 0.11f, 0.11f, 0.8f));
+        if (q == Selection.activeObject)
+        {
+            EditorGUI.DrawRect(highlighter, Color.white);
+        }
+        EditorGUI.DrawRect(grid, new Color(0.25f, 0.25f, 0.25f, 1f));
+        nodeRects[i] = grid;
+       
         bool missingSpeaker = string.IsNullOrEmpty(q.SpeakerName);
         bool missingText = string.IsNullOrEmpty(q.questionText);
         bool missingChoices = (q.choices == null || q.choices.Length == 0);
@@ -242,4 +253,11 @@ public class DialogueGraphWindow : EditorWindow
         }
         Handles.color = originalColor;
     }
+
+    void DrawToolStrip()
+    {
+        
+    }
+
+   
 }
