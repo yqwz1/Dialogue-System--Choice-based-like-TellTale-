@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -7,10 +8,13 @@ using UnityEngine;
 public class Question : ScriptableObject
 {
    public string SpeakerName;
-  
+   public Sprite sprite;
    [TextArea]
    public string questionText;
-   public Choice[] choices = new Choice[3];
+   public List<Choice> choices;
+   
+   
+   public Rect rect;
    
 
 

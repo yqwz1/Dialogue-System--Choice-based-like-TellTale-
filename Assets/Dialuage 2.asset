@@ -13,7 +13,18 @@ MonoBehaviour:
   m_Name: Dialuage 2
   m_EditorClassIdentifier: 
   SpeakerName: r
+  sprite: {fileID: 0}
   questionText: why you ignoring me
   choices:
   - text: asdad
     nextDialogue: {fileID: 0}
+  - text: New Choice
+    nextDialogue: {fileID: 0}
+  - text: New Choice
+    nextDialogue: {fileID: 0}
+  rect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
